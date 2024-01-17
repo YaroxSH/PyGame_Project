@@ -27,13 +27,18 @@ class Tile(pygame.sprite.Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(player_group, all_sprites)
+        self.image = player_image
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 15, tile_height * pos_y + 5)
+
+
 def load_level(filename):
-    # читаем уровень, убирая символы перевода строки
     with open(filename, 'r') as mapFile:
         level_map = [line.strip() for line in mapFile]
-    # и подсчитываем максимальную длину
     max_width = max(map(len, level_map))
-    # дополняем каждую строку пустыми клетками ('.')
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
@@ -45,10 +50,9 @@ def generate_level(level):
                 Tile('empty', x, y)
             elif level[y][x] == '#':
                 Tile('wall', x, y)
-            # elif level[y][x] == '@':
-                # Tile('empty', x, y)
-                # new_player = Player(x, y)
-    # вернем игрока, а также размер поля в клетках
+            elif level[y][x] == '@':
+                Tile('empty', x, y)
+                new_player = Player(x, y)
     return new_player, x, y
 
 
@@ -57,7 +61,7 @@ def generate_level(level):
 
 if __name__ == '__main__':
     pygame.init()
-    size = width, height = 1000, 750
+    size = width, height = 1350, 1000
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     fps = 60
@@ -70,16 +74,25 @@ if __name__ == '__main__':
         'wall': load_image('floor.png'),
         'empty': load_image('wall.png')
     }
-    # player_image = load_image('')
+    player_image = load_image('main_h.png')
     tile_width = tile_height = 50
-    player, level_x, level_y = generate_level(load_level('data/levels.txt'))
-    level_map = load_level('data/levels.txt')
+    player, level_x, level_y = generate_level(load_level('data/levels_variations/level_1.txt'))
+    level_map = load_level('data/levels_variations/level_1.txt')
     # Место под программу
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
+            if event.type == pygame.KEYDOWN:
+                x, y = player.rect.x // tile_width, player.rect.y // tile_width
+                if event.key == pygame.K_w and (level_map[y - 1][x] == '.' or level_map[y - 1][x] == '@'):
+                    player.rect.y -= tile_width
+                if event.key == pygame.K_s and (level_map[y + 1][x] == '.' or level_map[y + 1][x] == '@'):
+                    player.rect.y += tile_width
+                if event.key == pygame.K_a and (level_map[y][x - 1] == '.' or level_map[y][x - 1] == '@'):
+                    player.rect.x -= tile_width
+                if event.key == pygame.K_d and (level_map[y][x + 1] == '.' or level_map[y][x + 1] == '@'):
+                    player.rect.x += tile_width
         screen.fill('white')
         all_sprites.draw(screen)
         tiles_group.draw(screen)
