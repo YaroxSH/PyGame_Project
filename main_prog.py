@@ -43,7 +43,7 @@ def load_level(filename):
 
 
 def generate_level(level):
-    new_player, x, y = None, None, None
+    new_player, x, y, door = None, None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
@@ -53,7 +53,19 @@ def generate_level(level):
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
-    return new_player, x, y
+            elif level[y][x] == '&':
+                Tile('empty', x, y)
+                door = Door(x, y)
+    return new_player, x, y, door
+
+
+class Door(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__()
+        self.image = load_image('clever.png')
+        self.rect = self.image.get_rect()
+        self.rect = self.rect.move(50 * pos_x, 50 * pos_y)
+        self.add(door_group, all_sprites)
 
 
  # Место под классы
@@ -69,6 +81,7 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
+    door_group = pygame.sprite.Group()
     enemies_group = pygame.sprite.Group()
     tile_images = {
         'wall': load_image('floor.png'),
@@ -76,7 +89,7 @@ if __name__ == '__main__':
     }
     player_image = load_image('main_h(for time).png')
     tile_width = tile_height = 50
-    player, level_x, level_y = generate_level(load_level('data/levels_variations/level_1.txt'))
+    player, level_x, level_y, door = generate_level(load_level('data/levels_variations/level_1.txt'))
     level_map = load_level('data/levels_variations/level_1.txt')
     # Место под программу
     while running:
@@ -93,16 +106,19 @@ if __name__ == '__main__':
                     player.rect.x -= tile_width
                 if event.key == pygame.K_d and (level_map[y][x + 1] == '.' or level_map[y][x + 1] == '@'):
                     player.rect.x += tile_width
-                if event.key == pygame.K_SPACE:
-                    all_sprites.empty()
-                    tiles_group.empty()
-                    player_group.empty()
-                    player, level_x, level_y = generate_level(load_level('data/levels_variations/level_2.txt'))
-                    level_map = load_level('data/levels_variations/level_2.txt')
-        screen.fill('white')
-        all_sprites.draw(screen)
-        tiles_group.draw(screen)
-        player_group.draw(screen)
+        if not pygame.sprite.collide_rect(player, door):
+            screen.fill('black')
+            all_sprites.draw(screen)
+            tiles_group.draw(screen)
+            player_group.draw(screen)
+            door_group.draw(screen)
+        else:
+            all_sprites.empty()
+            tiles_group.empty()
+            player_group.empty()
+            door_group.empty()
+            player, level_x, level_y, door = generate_level(load_level('data/levels_variations/level_2.txt'))
+            level_map = load_level('data/levels_variations/level_2.txt')
         clock.tick(fps)
         pygame.display.flip()
     pygame.quit()
