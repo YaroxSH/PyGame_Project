@@ -74,7 +74,7 @@ if __name__ == '__main__':
         'wall': load_image('floor.png'),
         'empty': load_image('wall.png')
     }
-    player_image = load_image('main_h.png')
+    player_image = load_image('main_h(for time).png')
     tile_width = tile_height = 50
     player, level_x, level_y = generate_level(load_level('data/levels_variations/level_1.txt'))
     level_map = load_level('data/levels_variations/level_1.txt')
@@ -93,6 +93,12 @@ if __name__ == '__main__':
                     player.rect.x -= tile_width
                 if event.key == pygame.K_d and (level_map[y][x + 1] == '.' or level_map[y][x + 1] == '@'):
                     player.rect.x += tile_width
+                if event.key == pygame.K_SPACE:
+                    all_sprites.empty()
+                    tiles_group.empty()
+                    player_group.empty()
+                    player, level_x, level_y = generate_level(load_level('data/levels_variations/level_2.txt'))
+                    level_map = load_level('data/levels_variations/level_2.txt')
         screen.fill('white')
         all_sprites.draw(screen)
         tiles_group.draw(screen)
