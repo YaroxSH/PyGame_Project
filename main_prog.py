@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame
+import random
 
 
 def load_image(name, colorkey=None):
@@ -87,10 +88,13 @@ if __name__ == '__main__':
         'wall': load_image('floor.png'),
         'empty': load_image('wall.png')
     }
+    levels = os.listdir('data/levels_variations')
+    usd_levels = []
     player_image = load_image('main_h(for time).png')
     tile_width = tile_height = 50
     player, level_x, level_y, door = generate_level(load_level('data/levels_variations/level_1.txt'))
     level_map = load_level('data/levels_variations/level_1.txt')
+    cur_l = 'level_1.txt'
     # Место под программу
     while running:
         for event in pygame.event.get():
@@ -117,8 +121,20 @@ if __name__ == '__main__':
             tiles_group.empty()
             player_group.empty()
             door_group.empty()
-            player, level_x, level_y, door = generate_level(load_level('data/levels_variations/level_2.txt'))
-            level_map = load_level('data/levels_variations/level_2.txt')
+            levels.remove(cur_l)
+            next_l = random.choice(levels)
+            player, level_x, level_y, door = generate_level(load_level(f'data/levels_variations/{next_l}'))
+            level_map = load_level(f'data/levels_variations/{next_l}')
+            usd_levels.append([cur_l, 4])
+            cur_l = next_l
+            for i in range(len(usd_levels)):
+                usd_levels[i][1] = usd_levels[i][1] - 1
+                if usd_levels[i][1] <= 0:
+                    ret = usd_levels[i][0]
+                    levels.append(ret)
+            for i in usd_levels:
+                if i[1] <= 0:
+                    usd_levels.remove(i)
         clock.tick(fps)
         pygame.display.flip()
     pygame.quit()
