@@ -62,7 +62,7 @@ def generate_level(level):
 class Door(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
-        self.image = load_image('clever.png')
+        self.image = load_image('door.png')
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(50 * pos_x, 50 * pos_y)
         self.add(door_group, all_sprites)
@@ -98,13 +98,13 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.KEYDOWN:
                 x, y = player.rect.x // tile_width, player.rect.y // tile_width
-                if event.key == pygame.K_w and (level_map[y - 1][x] == '.' or level_map[y - 1][x] == '@'):
+                if event.key == pygame.K_w and level_map[y - 1][x] != '#':
                     player.rect.y -= tile_width
-                if event.key == pygame.K_s and (level_map[y + 1][x] == '.' or level_map[y + 1][x] == '@'):
+                if event.key == pygame.K_s and level_map[y + 1][x] != '#':
                     player.rect.y += tile_width
-                if event.key == pygame.K_a and (level_map[y][x - 1] == '.' or level_map[y][x - 1] == '@'):
+                if event.key == pygame.K_a and level_map[y][x - 1] != '#':
                     player.rect.x -= tile_width
-                if event.key == pygame.K_d and (level_map[y][x + 1] == '.' or level_map[y][x + 1] == '@'):
+                if event.key == pygame.K_d and level_map[y][x + 1] != '#':
                     player.rect.x += tile_width
         if not pygame.sprite.collide_rect(player, door):
             screen.fill('black')
