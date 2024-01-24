@@ -60,6 +60,11 @@ def generate_level(level):
     return new_player, x, y, door
 
 
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
 class Door(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
@@ -67,6 +72,38 @@ class Door(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(50 * pos_x, 50 * pos_y)
         self.add(door_group, all_sprites)
+
+
+def start_screen():
+    intro_text = ['ЛАБИРИНТ', '',
+                  'Добро пожаловать в "Лабиринт",',
+                  'игру в которой вы продвигаетесьпо подземелью.',
+                  'Чем ниже вы спускаетесь, тем больше опасностей вас ждёт.',
+                  'Лабиринт бесконечный, поэтому вы спускаетесь пока не умрёте.', '',
+                  f'Ваш рекорд: .', '',
+                  'Нажмите на любую кнопку чтобы начать игру.']
+    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 50)
+    text_coord = 150
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 100
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return
+        pygame.display.flip()
+        clock.tick(fps)
 
 
  # Место под классы
@@ -78,6 +115,8 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
     fps = 60
+    start_screen()
+    scr_coord = 1
     running = True
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
@@ -92,9 +131,10 @@ if __name__ == '__main__':
     usd_levels = []
     player_image = load_image('main_h(for time).png')
     tile_width = tile_height = 50
-    player, level_x, level_y, door = generate_level(load_level('data/levels_variations/level_1.txt'))
-    level_map = load_level('data/levels_variations/level_1.txt')
-    cur_l = 'level_1.txt'
+    strt_lvl = 'level_1.txt'
+    player, level_x, level_y, door = generate_level(load_level(f'data/levels_variations/{strt_lvl}'))
+    level_map = load_level(f'data/levels_variations/{strt_lvl}')
+    cur_l = strt_lvl
     # Место под программу
     while running:
         for event in pygame.event.get():
