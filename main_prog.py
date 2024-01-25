@@ -74,6 +74,11 @@ class Door(pygame.sprite.Sprite):
         self.add(door_group, all_sprites)
 
 
+def scoring(n):
+    fil = open('data/score.txt', 'w')
+    
+
+
 def start_screen():
     intro_text = ['ЛАБИРИНТ', '',
                   'Добро пожаловать в "Лабиринт",',
@@ -106,6 +111,10 @@ def start_screen():
         clock.tick(fps)
 
 
+def run_game():
+    pass
+
+
  # Место под классы
 
 
@@ -116,13 +125,13 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     fps = 60
     start_screen()
-    scr_coord = 1
     running = True
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     door_group = pygame.sprite.Group()
     enemies_group = pygame.sprite.Group()
+    score = 0
     tile_images = {
         'wall': load_image('floor.png'),
         'empty': load_image('wall.png')
@@ -150,12 +159,32 @@ if __name__ == '__main__':
                     player.rect.x -= tile_width
                 if event.key == pygame.K_d and level_map[y][x + 1] != '#':
                     player.rect.x += tile_width
+                if event.key == pygame.K_SPACE:
+                    all_sprites.empty()
+                    tiles_group.empty()
+                    player_group.empty()
+                    door_group.empty()
+                    levels.remove(cur_l)
+                    start_screen()
+                    levels = os.listdir('data/levels_variations')
+                    usd_levels = []
+                    player, level_x, level_y, door = generate_level(load_level(f'data/levels_variations/{strt_lvl}'))
+                    level_map = load_level(f'data/levels_variations/{strt_lvl}')
+                    cur_l = strt_lvl
+                    score = 0
         if not pygame.sprite.collide_rect(player, door):
             screen.fill('black')
             all_sprites.draw(screen)
             tiles_group.draw(screen)
             player_group.draw(screen)
             door_group.draw(screen)
+            fnt = pygame.font.Font(None, 50)
+            score_rendered = fnt.render(f'Счет: {score}', 1, pygame.Color('white'))
+            score_rect = score_rendered.get_rect()
+            score_rect.top = 1
+            score_rect.x = 1
+            screen.blit(score_rendered, score_rect)
+
         else:
             all_sprites.empty()
             tiles_group.empty()
@@ -175,6 +204,7 @@ if __name__ == '__main__':
             for i in usd_levels:
                 if i[1] <= 0:
                     usd_levels.remove(i)
+            score += 100
         clock.tick(fps)
         pygame.display.flip()
     pygame.quit()
