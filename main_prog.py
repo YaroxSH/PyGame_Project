@@ -76,16 +76,25 @@ class Door(pygame.sprite.Sprite):
 
 def scoring(n):
     fil = open('data/score.txt', 'w')
-    
+    fil.write(str(n))
+    fil.close()
+
+
+def open_score():
+    fil = open('data/score.txt')
+    scr = fil.read()
+    fil.close()
+    return int(scr)
 
 
 def start_screen():
+    scr = open_score()
     intro_text = ['ЛАБИРИНТ', '',
                   'Добро пожаловать в "Лабиринт",',
                   'игру в которой вы продвигаетесьпо подземелью.',
                   'Чем ниже вы спускаетесь, тем больше опасностей вас ждёт.',
                   'Лабиринт бесконечный, поэтому вы спускаетесь пока не умрёте.', '',
-                  f'Ваш рекорд: .', '',
+                  f'Ваш рекорд: {scr}', '',
                   'Нажмите на любую кнопку чтобы начать игру.']
     fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -109,10 +118,6 @@ def start_screen():
                 return
         pygame.display.flip()
         clock.tick(fps)
-
-
-def run_game():
-    pass
 
 
  # Место под классы
@@ -165,12 +170,19 @@ if __name__ == '__main__':
                     player_group.empty()
                     door_group.empty()
                     levels.remove(cur_l)
+                    rs = open_score()
+                    if score > rs:
+                        scoring(score)
+                    score = 0
                     start_screen()
                     levels = os.listdir('data/levels_variations')
                     usd_levels = []
                     player, level_x, level_y, door = generate_level(load_level(f'data/levels_variations/{strt_lvl}'))
                     level_map = load_level(f'data/levels_variations/{strt_lvl}')
                     cur_l = strt_lvl
+                    rs = open_score()
+                    if score > rs:
+                        scoring(score)
                     score = 0
         if not pygame.sprite.collide_rect(player, door):
             screen.fill('black')
