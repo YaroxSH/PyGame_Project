@@ -1,2 +1,2 @@
-git clone
-pip install requirements.txt
+git clone <URL>
+python3 -m pip install -r requirements.txt
